@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Abundantly - Billing Management System</title>
+    
+    <!-- React and Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { Plus, Trash2, DollarSign, Clock, Users, Calculator, RotateCcw, FileText, AlertCircle, CheckCircle, User, Calendar, Eye, EyeOff, Lock, X, Search, Download, TrendingUp, Bell, Filter, Upload, Save, Database, Heart } = lucide;
+
+        const LifeAbundantlyBillingSystem = () => {
+            const [clients, setClients] = useState([
+                { id: 1, name: 'Author Carr', insurance: 'HealthyBlue', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: 'Regular attendance, good progress', serviceType: 'SACOT' },
+                { id: 2, name: 'Braxton Holiday', insurance: 'Carolina Complete', status: '1st Note Submitted 8/8/25 Processed', contracted: true, specialNotes: 'Processed successfully', serviceType: 'SACOT' },
+                { id: 3, name: 'Carl Faison', insurance: 'Carolina Complete', status: '1st Note Not Yet Submitted', contracted: true, specialNotes: 'Need to submit initial documentation', serviceType: 'SACOT' },
+                { id: 4, name: 'Coyderra Williams', insurance: 'Alliance', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 5, name: 'Damari Harper', insurance: 'AmeriHealth', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 6, name: 'David Taborn', insurance: 'Alliance', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 7, name: 'Eugene Williams', insurance: 'AmeriHealth', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 8, name: 'Iran El Bey', insurance: 'BCBS NC', status: 'Concerned about Peer Placement', contracted: true, specialNotes: 'Monitor peer placement status', serviceType: 'SACOT' },
+                { id: 9, name: 'Joseph Patterson', insurance: 'Vaya', status: 'Submitted 7/1-8/4 Both Denied - Not in contract', contracted: false, specialNotes: 'Contract negotiation needed', serviceType: 'SACOT' },
+                { id: 10, name: 'Kemp Nichols', insurance: 'BCBS NC', status: 'Billed 7/1-8/4', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 11, name: 'Kenneth Charles Wilson', insurance: 'Alliance', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 12, name: 'Lucian Deberry', insurance: 'AmeriHealth', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 13, name: 'Lindel Wynn', insurance: 'BCBS NC', status: 'Billed 7/1-8', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 14, name: 'Raymond Addae', insurance: 'UHC', status: 'Not Currently Contracted', contracted: false, specialNotes: 'Awaiting contract approval', serviceType: 'SACOT' },
+                { id: 15, name: 'Rodney Jones Sr', insurance: 'Alliance', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 16, name: 'Sade Knox', insurance: 'Alliance', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 17, name: 'Shacora Parker', insurance: 'BCBS NC', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 18, name: 'Tatayanna Dail', insurance: 'AmeriHealth', status: '1st Note Submitted 7/1/25-8/4', contracted: true, specialNotes: '', serviceType: 'SACOT' },
+                { id: 19, name: 'Timothy Poole', insurance: 'Carolina Complete', status: '1st Note Submitted 8/8/25 Processed', contracted: true, specialNotes: 'Processed successfully', serviceType: 'SACOT' },
+                { id: 20, name: 'Trevarius Eaddy', insurance: 'AmeriHealth', status: '1st Note Submitted 8/8/25', contracted: true, specialNotes: '', serviceType: 'SACOT' }
+            ]);
+
+            const [weeklyData, setWeeklyData] = useState([]);
+            const [currentWeek, setCurrentWeek] = useState('');
+            const [sacotHourlyRate] = useState(58.61);
+            const [saiopDailyRate] = useState(170.03);
+            const [selectedTab, setSelectedTab] = useState('overview');
+            const [showFinancials, setShowFinancials] = useState(true);
+            const [showPasswordModal, setShowPasswordModal] = useState(false);
+            const [passwordInput, setPasswordInput] = useState('');
+            const [financialPassword] = useState('1234');
+            
+            // New state for enhanced features
+            const [searchTerm, setSearchTerm] = useState('');
+            const [insuranceFilter, setInsuranceFilter] = useState('all');
+            const [contractFilter, setContractFilter] = useState('all');
+            const [serviceFilter, setServiceFilter] = useState('all');
+            const [showExportModal, setShowExportModal] = useState(false);
+            const [showImportModal, setShowImportModal] = useState(false);
+            const [notifications, setNotifications] = useState([]);
+            const [lastSaved, setLastSaved] = useState(null);
+
+            // Initialize current week and load saved data
+            useEffect(() => {
+                const today = new Date();
+                const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+                const weekString = weekStart.toISOString().split('T')[0];
+                setCurrentWeek(weekString);
+                
+                // Load saved data from localStorage
+                loadSavedData();
+            }, []);
+
+            // Auto-save data whenever clients or weeklyData changes
+            useEffect(() => {
+                if (clients.length > 0 || weeklyData.length > 0) {
+                    saveDataToLocalStorage();
+                }
+            }, [clients, weeklyData]);
+
+            // Check deadlines when weeklyData changes
+            useEffect(() => {
+                checkDeadlines();
+            }, [weeklyData]);
+
+            // Save data to localStorage
+            const saveDataToLocalStorage = () => {
+                try {
+                    const dataToSave = {
+                        clients,
+                        weeklyData,
+                        lastSaved: new Date().toISOString(),
+                        version: '2.0'
+                    };
+                    
+                    const dataString = JSON.stringify(dataToSave);
+                    window.localStorage?.setItem('life-abundantly-billing-data', dataString);
+                    setLastSaved(new Date());
+                } catch (error) {
+                    console.warn('Could not save to localStorage:', error);
+                }
+            };
+
+            // Load data from localStorage
+            const loadSavedData = () => {
+                try {
+                    const savedData = window.localStorage?.getItem('life-abundantly-billing-data');
+                    if (savedData) {
+                        const parsedData = JSON.parse(savedData);
+                        if (parsedData.clients && parsedData.weeklyData) {
+                            setClients(parsedData.clients);
+                            setWeeklyData(parsedData.weeklyData);
+                            setLastSaved(new Date(parsedData.lastSaved));
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Could not load from localStorage:', error);
+                }
+            };
+
+            // Clear all saved data
+            const clearAllData = () => {
+                const confirmed = window.confirm('Are you sure you want to clear ALL data? This will remove all clients, weeks, and billing information and cannot be undone.');
+                if (confirmed) {
+                    setClients([]);
+                    setWeeklyData([]);
+                    window.localStorage?.removeItem('life-abundantly-billing-data');
+                    setLastSaved(null);
+                }
+            };
+
+            // Check for deadline violations and create notifications
+            const checkDeadlines = () => {
+                const newNotifications = [];
+                const today = new Date();
+                
+                weeklyData.forEach((week, index) => {
+                    const weekEnd = new Date(week.weekEnd);
+                    const sundayAfter = new Date(weekEnd.getTime() + 2 * 24 * 60 * 60 * 1000);
+                    const incompleteTasks = week.clients.filter(client => {
+                        return !client.notes || client.notes.trim() === '' || client.totalValue === 0;
+                    });
+                    
+                    if (incompleteTasks.length > 0) {
+                        if (today > sundayAfter) {
+                            newNotifications.push({
+                                id: `deadline-${index}`,
+                                type: 'error',
+                                message: `Week ${new Date(week.weekStart).toLocaleDateString()} - ${incompleteTasks.length} clients missing notes (OVERDUE)`,
+                                count: incompleteTasks.length
+                            });
+                        } else if (today >= new Date(sundayAfter.getTime() - 2 * 24 * 60 * 60 * 1000)) {
+                            newNotifications.push({
+                                id: `warning-${index}`,
+                                type: 'warning',
+                                message: `Week ${new Date(week.weekStart).toLocaleDateString()} - ${incompleteTasks.length} clients missing notes (Due Sunday)`,
+                                count: incompleteTasks.length
+                            });
+                        }
+                    }
+                });
+                
+                setNotifications(newNotifications);
+            };
+
+            const addWeek = () => {
+                if (!currentWeek) return;
+                
+                const newWeekData = {
+                    weekStart: currentWeek,
+                    weekEnd: new Date(new Date(currentWeek).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    clients: clients.map(client => ({
+                        clientId: client.id,
+                        name: client.name,
+                        insurance: client.insurance,
+                        serviceType: client.serviceType,
+                        // Universal fields that adapt based on service type
+                        mondayValue: client.serviceType === 'SACOT' ? 0 : false,
+                        tuesdayValue: client.serviceType === 'SACOT' ? 0 : false,
+                        wednesdayValue: client.serviceType === 'SACOT' ? 0 : false,
+                        thursdayValue: client.serviceType === 'SACOT' ? 0 : false,
+                        fridayValue: client.serviceType === 'SACOT' ? 0 : false,
+                        totalValue: 0,
+                        billing: 0,
+                        notes: '',
+                        paymentStatus: 'Pending'
+                    }))
+                };
+                
+                setWeeklyData([...weeklyData, newWeekData]);
+            };
+
+            const updateClientValue = (weekIndex, clientIndex, day, value) => {
+                const updatedWeeks = [...weeklyData];
+                const client = updatedWeeks[weekIndex].clients[clientIndex];
+                client[`${day}Value`] = client.serviceType === 'SACOT' ? (parseFloat(value) || 0) : value;
+                
+                // Calculate totals based on service type
+                if (client.serviceType === 'SACOT') {
+                    client.totalValue = client.mondayValue + client.tuesdayValue + 
+                                     client.wednesdayValue + client.thursdayValue + client.fridayValue;
+                    client.billing = client.totalValue * sacotHourlyRate;
+                } else {
+                    client.totalValue = [
+                        client.mondayValue,
+                        client.tuesdayValue,
+                        client.wednesdayValue,
+                        client.thursdayValue,
+                        client.fridayValue
+                    ].filter(Boolean).length;
+                    client.billing = client.totalValue * saiopDailyRate;
+                }
+                
+                setWeeklyData(updatedWeeks);
+            };
+
+            const updateClientNotes = (weekIndex, clientIndex, notes) => {
+                const updatedWeeks = [...weeklyData];
+                updatedWeeks[weekIndex].clients[clientIndex].notes = notes;
+                setWeeklyData(updatedWeeks);
+            };
+
+            const updatePaymentStatus = (weekIndex, clientIndex, status) => {
+                const updatedWeeks = [...weeklyData];
+                updatedWeeks[weekIndex].clients[clientIndex].paymentStatus = status;
+                setWeeklyData(updatedWeeks);
+            };
+
+            const removeWeek = (weekIndex) => {
+                const updatedWeeks = weeklyData.filter((_, index) => index !== weekIndex);
+                setWeeklyData(updatedWeeks);
+            };
+
+            const clearFinancialData = () => {
+                const confirmed = window.confirm('Are you sure you want to permanently clear all financial data? This will keep service hours but remove billing amounts and cannot be undone.');
+                if (confirmed) {
+                    const updatedWeeks = weeklyData.map(week => ({
+                        ...week,
+                        clients: week.clients.map(client => ({
+                            ...client,
+                            billing: 0
+                        }))
+                    }));
+                    setWeeklyData(updatedWeeks);
+                }
+            };
+
+            const toggleFinancialVisibility = () => {
+                if (showFinancials) {
+                    setShowFinancials(false);
+                } else {
+                    setShowPasswordModal(true);
+                    setPasswordInput('');
+                }
+            };
+
+            const handlePasswordSubmit = () => {
+                if (passwordInput === financialPassword) {
+                    setShowFinancials(true);
+                    setShowPasswordModal(false);
+                    setPasswordInput('');
+                } else {
+                    alert('Incorrect password. Please try again.');
+                    setPasswordInput('');
+                }
+            };
+
+            const handlePasswordKeyPress = (e) => {
+                if (e.key === 'Enter') {
+                    handlePasswordSubmit();
+                }
+            };
+
+            const closePasswordModal = () => {
+                setShowPasswordModal(false);
+                setPasswordInput('');
+            };
+
+            const calculateWeekTotals = (week) => {
+                const sacotHours = week.clients.filter(c => c.serviceType === 'SACOT').reduce((sum, client) => sum + (client.totalValue || 0), 0);
+                const sacotBilling = week.clients.filter(c => c.serviceType === 'SACOT').reduce((sum, client) => sum + (client.billing || 0), 0);
+                const saiopDays = week.clients.filter(c => c.serviceType === 'SAIOP').reduce((sum, client) => sum + (client.totalValue || 0), 0);
+                const saiopBilling = week.clients.filter(c => c.serviceType === 'SAIOP').reduce((sum, client) => sum + (client.billing || 0), 0);
+                const totalBilling = sacotBilling + saiopBilling;
+                
+                return { sacotHours, sacotBilling, saiopDays, saiopBilling, totalBilling };
+            };
+
+            const calculateGrandTotals = () => {
+                const totals = weeklyData.reduce((acc, week) => {
+                    const weekTotal = calculateWeekTotals(week);
+                    return {
+                        sacotHours: acc.sacotHours + weekTotal.sacotHours,
+                        sacotBilling: acc.sacotBilling + weekTotal.sacotBilling,
+                        saiopDays: acc.saiopDays + weekTotal.saiopDays,
+                        saiopBilling: acc.saiopBilling + weekTotal.saiopBilling,
+                        totalBilling: acc.totalBilling + weekTotal.totalBilling
+                    };
+                }, { sacotHours: 0, sacotBilling: 0, saiopDays: 0, saiopBilling: 0, totalBilling: 0 });
+                
+                return totals;
+            };
+
+            // Revenue forecasting
+            const calculateRevenueForecast = () => {
+                if (weeklyData.length < 2) return null;
+                
+                const recentWeeks = weeklyData.slice(-4);
+                const avgWeeklyRevenue = recentWeeks.reduce((sum, week) => {
+                    const weekTotal = calculateWeekTotals(week);
+                    return sum + weekTotal.totalBilling;
+                }, 0) / recentWeeks.length;
+                
+                return {
+                    weeklyAverage: avgWeeklyRevenue,
+                    monthlyForecast: avgWeeklyRevenue * 4.33,
+                    quarterlyForecast: avgWeeklyRevenue * 13
+                };
+            };
+
+            const addClient = () => {
+                const newClient = {
+                    id: Math.max(...clients.map(c => c.id)) + 1,
+                    name: 'New Client',
+                    insurance: 'TBD',
+                    status: 'Pending',
+                    contracted: true,
+                    specialNotes: '',
+                    serviceType: 'SACOT'
+                };
+                setClients([...clients, newClient]);
+            };
+
+            const updateClient = (clientId, field, value) => {
+                const updatedClients = clients.map(client => 
+                    client.id === clientId ? { ...client, [field]: value } : client
+                );
+                setClients(updatedClients);
+            };
+
+            const removeClient = (clientId) => {
+                const updatedClients = clients.filter(client => client.id !== clientId);
+                setClients(updatedClients);
+            };
+
+            // Export functionality
+            const exportToCSV = () => {
+                const csvContent = generateCSVContent();
+                downloadFile(csvContent, 'text/csv', `Life_Abundantly_Report_${new Date().toISOString().split('T')[0]}.csv`);
+                setShowExportModal(false);
+            };
+
+            const exportToJSON = () => {
+                const dataToExport = {
+                    clients,
+                    weeklyData,
+                    exportDate: new Date().toISOString(),
+                    version: '2.0'
+                };
+                const jsonContent = JSON.stringify(dataToExport, null, 2);
+                downloadFile(jsonContent, 'application/json', `Life_Abundantly_Backup_${new Date().toISOString().split('T')[0]}.json`);
+                setShowExportModal(false);
+            };
+
+            const downloadFile = (content, mimeType, filename) => {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const generateCSVContent = () => {
+                let content = 'Week Start,Week End,Client Name,Insurance,Service Type,Monday,Tuesday,Wednesday,Thursday,Friday,Total,Billing Amount,Payment Status,Notes\n';
+                
+                weeklyData.forEach(week => {
+                    week.clients.forEach(client => {
+                        const totalLabel = client.serviceType === 'SACOT' ? `${client.totalValue} hours` : `${client.totalValue} days`;
+                        content += `${week.weekStart},${week.weekEnd},${client.name},${client.insurance},${client.serviceType},${client.mondayValue || 0},${client.tuesdayValue || 0},${client.wednesdayValue || 0},${client.thursdayValue || 0},${client.fridayValue || 0},${totalLabel},${client.billing || 0},${client.paymentStatus || 'Pending'},"${client.notes || ''}"\n`;
+                    });
+                });
+                
+                return content;
+            };
+
+            // Import functionality
+            const handleFileImport = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (importedData.clients && importedData.weeklyData) {
+                            const confirmed = window.confirm('This will replace all current data. Are you sure you want to import this backup?');
+                            if (confirmed) {
+                                setClients(importedData.clients);
+                                setWeeklyData(importedData.weeklyData);
+                                setShowImportModal(false);
+                                alert('Data imported successfully!');
+                            }
+                        } else {
+                            alert('Invalid backup file format.');
+                        }
+                    } catch (error) {
+                        alert('Error reading backup file. Please check the file format.');
+                    }
+                };
+                reader.readAsText(file);
+                event.target.value = '';
+            };
+
+            // Filtering functions
+            const filteredClients = clients.filter(client => {
+                const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                     client.insurance.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                     client.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                     client.specialNotes.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                const matchesInsurance = insuranceFilter === 'all' || client.insurance === insuranceFilter;
+                const matchesContract = contractFilter === 'all' || 
+                                       (contractFilter === 'contracted' && client.contracted) ||
+                                       (contractFilter === 'uncontracted' && !client.contracted);
+                const matchesService = serviceFilter === 'all' || client.serviceType === serviceFilter;
+                
+                return matchesSearch && matchesInsurance && matchesContract && matchesService;
+            });
+
+            const getInsuranceColor = (insurance) => {
+                const colors = {
+                    'Alliance': 'bg-blue-100 text-blue-800',
+                    'AmeriHealth': 'bg-green-100 text-green-800',
+                    'BCBS NC': 'bg-purple-100 text-purple-800',
+                    'Carolina Complete': 'bg-orange-100 text-orange-800',
+                    'HealthyBlue': 'bg-cyan-100 text-cyan-800',
+                    'Vaya': 'bg-pink-100 text-pink-800',
+                    'UHC': 'bg-gray-100 text-gray-800',
+                    'Partners': 'bg-indigo-100 text-indigo-800'
+                };
+                return colors[insurance] || 'bg-gray-100 text-gray-800';
+            };
+
+            const getServiceTypeColor = (serviceType) => {
+                return serviceType === 'SACOT' 
+                    ? 'bg-emerald-100 text-emerald-800' 
+                    : 'bg-violet-100 text-violet-800';
+            };
+
+            const getPaymentStatusColor = (status) => {
+                const colors = {
+                    'Paid': 'bg-green-100 text-green-800',
+                    'Pending': 'bg-yellow-100 text-yellow-800',
+                    'Denied': 'bg-red-100 text-red-800'
+                };
+                return colors[status] || 'bg-gray-100 text-gray-800';
+            };
+
+            const getStatusIcon = (contracted, status) => {
+                if (!contracted) return React.createElement(AlertCircle, { className: "h-4 w-4 text-red-500" });
+                if (status.includes('Processed') || status.includes('Billed')) return React.createElement(CheckCircle, { className: "h-4 w-4 text-green-500" });
+                return React.createElement(Clock, { className: "h-4 w-4 text-yellow-500" });
+            };
+
+            const grandTotals = calculateGrandTotals();
+            const contractedClients = clients.filter(c => c.contracted).length;
+            const sacotClients = clients.filter(c => c.serviceType === 'SACOT').length;
+            const saiopClients = clients.filter(c => c.serviceType === 'SAIOP').length;
+            const forecast = calculateRevenueForecast();
+            const uniqueInsurances = [...new Set(clients.map(c => c.insurance))];
+
+            return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-slate-50 to-blue-50" },
+                
+                // Password Modal
+                showPasswordModal && React.createElement('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" },
+                    React.createElement('div', { className: "bg-white rounded-2xl p-8 shadow-2xl border border-slate-200 max-w-md w-full mx-4" },
+                        React.createElement('div', { className: "flex items-center justify-between mb-6" },
+                            React.createElement('div', { className: "flex items-center space-x-3" },
+                                React.createElement(Lock, { className: "h-6 w-6 text-blue-600" }),
+                                React.createElement('h3', { className: "text-xl font-bold text-slate-800" }, "Enter Password")
+                            ),
+                            React.createElement('button', {
+                                onClick: closePasswordModal,
+                                className: "text-slate-400 hover:text-slate-600 transition-colors"
+                            }, React.createElement(X, { className: "h-6 w-6" }))
+                        ),
+                        React.createElement('p', { className: "text-slate-600 mb-6" }, "Please enter the 4-digit password to view financial data."),
+                        React.createElement('div', { className: "mb-6" },
+                            React.createElement('input', {
+                                type: "password",
+                                value: passwordInput,
+                                onChange: (e) => setPasswordInput(e.target.value),
+                                onKeyPress: handlePasswordKeyPress,
+                                placeholder: "••••",
+                                maxLength: "4",
+                                className: "w-full p-4 text-center text-2xl tracking-widest border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                                autoFocus: true
+                            })
+                        ),
+                        React.createElement('div', { className: "flex space-x-3" },
+                            React.createElement('button', {
+                                onClick: closePasswordModal,
+                                className: "flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors"
+                            }, "Cancel"),
+                            React.createElement('button', {
+                                onClick: handlePasswordSubmit,
+                                className: "flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200"
+                            }, "Unlock")
+                        )
+                    )
+                ),
+
+                React.createElement('div', { className: "max-w-7xl mx-auto p-6" },
+                    // Header
+                    React.createElement('div', { className: "bg-white rounded-2xl shadow-xl p-8 mb-8 border border-slate-200" },
+                        React.createElement('div', { className: "flex items-center justify-between mb-6" },
+                            React.createElement('div', { className: "flex items-center space-x-4" },
+                                React.createElement(Heart, { className: "h-12 w-12 text-rose-500" }),
+                                React.createElement('div', null,
+                                    React.createElement('h1', { className: "text-4xl font-bold bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent" }, "Life Abundantly"),
+                                    React.createElement('p', { className: "text-slate-600 mt-1 text-lg" }, "Comprehensive Billing Management System"),
+                                    React.createElement('div', { className: "flex items-center mt-2 space-x-4" },
+                                        React.createElement('span', { className: "bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium" }, `SACOT: H2035 - $${sacotHourlyRate}/hr`),
+                                        React.createElement('span', { className: "bg-violet-100 text-violet-700 px-3 py-1 rounded-full text-sm font-medium" }, `SAIOP: H0015 - $${saiopDailyRate}/day`)
+                                    )
+                                )
+                            ),
+                            lastSaved && React.createElement('div', { className: "flex items-center text-sm text-slate-500" },
+                                React.createElement(Save, { className: "h-4 w-4 mr-1" }),
+                                React.createElement('span', null, `Saved ${lastSaved.toLocaleTimeString()}`)
+                            )
+                        ),
+
+                        // Summary Cards
+                        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6" },
+                            React.createElement('div', { className: "bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white" },
+                                React.createElement('div', { className: "flex items-center justify-between" },
+                                    React.createElement('div', null,
+                                        React.createElement('div', { className: "text-3xl font-bold" }, clients.length),
+                                        React.createElement('div', { className: "text-blue-100 text-sm" }, "Total Clients"),
+                                        React.createElement('div', { className: "text-xs text-blue-200 mt-1" }, `${contractedClients} contracted`)
+                                    ),
+                                    React.createElement(Users, { className: "h-12 w-12 text-blue-200" })
+                                )
+                            ),
+                            React.createElement('div', { className: "bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-xl text-white" },
+                                React.createElement('div', { className: "flex items-center justify-between" },
+                                    React.createElement('div', null,
+                                        React.createElement('div', { className: "text-3xl font-bold" }, sacotClients),
+                                        React.createElement('div', { className: "text-emerald-100 text-sm" }, "SACOT Clients"),
+                                        React.createElement('div', { className: "text-xs text-emerald-200 mt-1" }, `${grandTotals.sacotHours} hours`)
+                                    ),
+                                    React.createElement(Clock, { className: "h-12 w-12 text-emerald-200" })
+                                )
+                            ),
+                            React.createElement('div', { className: "bg-gradient-to-br from-violet-500 to-violet-600 p-6 rounded-xl text-white" },
+                                React.createElement('div', { className: "flex items-center justify-between" },
+                                    React.createElement('div', null,
+                                        React.createElement('div', { className: "text-3xl font-bold" }, saiopClients),
+                                        React.createElement('div', { className: "text-violet-100 text-sm" }, "SAIOP Clients"),
+                                        React.createElement('div', { className: "text-xs text-violet-200 mt-1" }, `${grandTotals.saiopDays} days`)
+                                    ),
+                                    React.createElement(Calendar, { className: "h-12 w-12 text-violet-200" })
+                                )
+                            ),
+                            React.createElement('div', { className: "bg-gradient-to-br from-rose-500 to-rose-600 p-6 rounded-xl text-white" },
+                                React.createElement('div', { className: "flex items-center justify-between" },
+                                    React.createElement('div', null,
+                                        React.createElement('div', { className: "text-2xl font-bold" }, showFinancials ? `$${grandTotals.sacotBilling.toLocaleString('en-US', {minimumFractionDigits: 0})}` : '••••••'),
+                                        React.createElement('div', { className: "text-rose-100 text-sm" }, "SACOT Revenue"),
+                                        React.createElement('div', { className: "text-xs text-rose-200 mt-1" }, showFinancials ? 'Hourly billing' : 'Hidden')
+                                    ),
+                                    React.createElement(DollarSign, { className: "h-12 w-12 text-rose-200" })
+                                )
+                            ),
+                            React.createElement('div', { className: "bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl text-white" },
+                                React.createElement('div', { className: "flex items-center justify-between" },
+                                    React.createElement('div', null,
+                                        React.createElement('div', { className: "text-2xl font-bold" }, showFinancials ? `$${grandTotals.saiopBilling.toLocaleString('en-US', {minimumFractionDigits: 0})}` : '••••••'),
+                                        React.createElement('div', { className: "text-purple-100 text-sm" }, "SAIOP Revenue"),
+                                        React.createElement('div', { className: "text-xs text-purple-200 mt-1" }, showFinancials ? 'Daily billing' : 'Hidden')
+                                    ),
+                                    React.createElement(Calculator, { className: "h-12 w-12 text-purple-200" })
+                                )
+                            ),
+                            React.createElement('div', { className: "bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white" },
+                                React.createElement('div', { className: "flex items-center justify-between" },
+                                    React.createElement('div', null,
+                                        React.createElement('div', { className: "text-2xl font-bold" }, showFinancials ? `$${grandTotals.totalBilling.toLocaleString('en-US', {minimumFractionDigits: 0})}` : '••••••'),
+                                        React.createElement('div', { className: "text-green-100 text-sm" }, "Total Revenue"),
+                                        React.createElement('div', { className: "text-xs text-green-200 mt-1" }, showFinancials ? 'Combined billing' : 'Hidden')
+                                    ),
+                                    React.createElement(DollarSign, { className: "h-12 w-12 text-green-200" })
+                                )
+                            )
+                        ),
+
+                        // Revenue Forecast Card
+                        forecast && showFinancials && React.createElement('div', { className: "bg-gradient-to-r from-slate-100 to-blue-100 rounded-xl p-6 mb-6" },
+                            React.createElement('div', { className: "flex items-center mb-4" },
+                                React.createElement(TrendingUp, { className: "h-6 w-6 text-blue-600 mr-3" }),
+                                React.createElement('h3', { className: "text-xl font-bold text-slate-800" }, "Revenue Projections")
+                            ),
+                            React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-6" },
+                                React.createElement('div', { className: "text-center" },
+                                    React.createElement('div', { className: "text-3xl font-bold text-blue-600" }, `$${forecast.weeklyAverage.toLocaleString('en-US', {minimumFractionDigits: 0})}`),
+                                    React.createElement('div', { className: "text-slate-600 font-medium" }, "Weekly Average"),
+                                    React.createElement('div', { className: "text-sm text-slate-500" }, "Last 4 weeks")
+                                ),
+                                React.createElement('div', { className: "text-center" },
+                                    React.createElement('div', { className: "text-3xl font-bold text-green-600" }, `$${forecast.monthlyForecast.toLocaleString('en-US', {minimumFractionDigits: 0})}`),
+                                    React.createElement('div', { className: "text-slate-600 font-medium" }, "Monthly Projection"),
+                                    React.createElement('div', { className: "text-sm text-slate-500" }, "4.33 weeks")
+                                ),
+                                React.createElement('div', { className: "text-center" },
+                                    React.createElement('div', { className: "text-3xl font-bold text-purple-600" }, `$${forecast.quarterlyForecast.toLocaleString('en-US', {minimumFractionDigits: 0})}`),
+                                    React.createElement('div', { className: "text-slate-600 font-medium" }, "Quarterly Projection"),
+                                    React.createElement('div', { className: "text-sm text-slate-500" }, "13 weeks")
+                                )
+                            )
+                        )
+                    ),
+
+                    // Simple client management message
+                    React.createElement('div', { className: "bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center" },
+                        React.createElement('h2', { className: "text-2xl font-bold text-slate-800 mb-4" }, "Life Abundantly Billing System"),
+                        React.createElement('p', { className: "text-slate-600 mb-6" }, "Professional billing management for SACOT and SAIOP services"),
+                        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-6" },
+                            React.createElement('div', { className: "p-6 bg-emerald-50 rounded-xl" },
+                                React.createElement('h3', { className: "text-lg font-semibold text-emerald-800 mb-2" }, "SACOT Services"),
+                                React.createElement('p', { className: "text-emerald-600" }, "Hourly billing at $58.61/hour")
+                            ),
+                            React.createElement('div', { className: "p-6 bg-violet-50 rounded-xl" },
+                                React.createElement('h3', { className: "text-lg font-semibold text-violet-800 mb-2" }, "SAIOP Services"),
+                                React.createElement('p', { className: "text-violet-600" }, "Daily billing at $170.03/day")
+                            )
+                        ),
+                        React.createElement('div', { className: "mt-6 flex justify-center space-x-4" },
+                            React.createElement('button', {
+                                onClick: addWeek,
+                                className: "px-6 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl hover:from-rose-600 hover:to-rose-700 shadow-lg transition-all duration-200"
+                            }, "Start Adding Weekly Data"),
+                            React.createElement('button', {
+                                onClick: toggleFinancialVisibility,
+                                className: "px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all duration-200"
+                            }, showFinancials ? "Hide Financials" : "Show Financials")
+                        )
+                    )
+                )
+            );
+        };
+
+        ReactDOM.render(React.createElement(LifeAbundantlyBillingSystem), document.getElementById('root'));
+    </script>
+</body>
+</html>
